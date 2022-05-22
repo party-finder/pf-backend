@@ -4,7 +4,7 @@ import {
     ApiForbiddenResponse, ApiHeader, ApiOperation,
     ApiTags, ApiUnauthorizedResponse
 } from '@nestjs/swagger';
-import { RegisterDto } from 'src/Models/dto/register.dto';
+import { RegisterDto } from 'src/Models/dto/Register.dto';
 import { LoginDto } from 'src/Models/dto/Login.dto';
 import { AuthService } from './auth.service';
 import { RefreshTokenDto } from 'src/Models/dto/RefreshToken.dto';
