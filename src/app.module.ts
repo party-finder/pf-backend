@@ -11,7 +11,7 @@ import { AuthModule } from './auth/auth.module';
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`
     }),
-    MongooseModule.forRoot(`mongodb://${process.env.USER}:${process.env.PASSWORD}@${process.env.URL}/${process.env.DATABASE}?authSource=admin`)
+    MongooseModule.forRoot(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_DATABASE}?authSource=admin`)
   ],
 })
 export class AppModule { }
