@@ -12,6 +12,7 @@ export class RegisterDto {
     @IsString()
     @MaxLength(24)
     @MinLength(3)
+    @IsNotEmpty()
     readonly username: string;
 
     @ApiProperty({
@@ -34,6 +35,7 @@ export class RegisterDto {
     @IsString()
     @MaxLength(128)
     @MinLength(8)
+    @IsNotEmpty()
     readonly password: string;
 
 }
