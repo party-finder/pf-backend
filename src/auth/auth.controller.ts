@@ -30,7 +30,10 @@ export class AuthController {
                     type: "string",
                     example: "Пользователь успешно создан"
                 }
-            }
+            },
+            required: [
+                "message"
+            ]
         }
     })
     @ApiBadRequestResponse({
@@ -41,7 +44,10 @@ export class AuthController {
                     type: "string",
                     example: "Ошибка: Пользователь не был создан"
                 }
-            }
+            },
+            required: [
+                "message"
+            ]
         }
     })
     @Post("register")
@@ -71,7 +77,10 @@ export class AuthController {
                     type: "string",
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv3v8"
                 }
-            }
+            },
+            required: [
+                "token", "refreshToken"
+            ]
         }
     })
     @ApiBadRequestResponse({
@@ -82,7 +91,10 @@ export class AuthController {
                     type: "string",
                     example: "Ошибка: неверный логин или пароль"
                 }
-            }
+            },
+            required: [
+                "message"
+            ]
         }
     })
     @Post("login")
@@ -118,14 +130,39 @@ export class AuthController {
                     type: "string",
                     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv39",
                 }
-            }
+            },
+            required: [
+                "token"
+            ]
         }
     })
     @ApiUnauthorizedResponse({
-        description: "Вы не авторизованы, попробуйте снова"
+        schema: {
+            type: "object",
+            properties: {
+                message: {
+                    type: "string",
+                    example: "Вы не авторизованы, попробуйте снова",
+                }
+            },
+            required: [
+                "message"
+            ]
+        }
     })
     @ApiForbiddenResponse({
-        description: "Токен не найден"
+        schema: {
+            type: "object",
+            properties: {
+                message: {
+                    type: "string",
+                    example: "Токен не найден",
+                }
+            },
+            required: [
+                "message"
+            ]
+        }
     })
     @Post("token")
     public async token(@Res() res: Response<
@@ -156,10 +193,32 @@ export class AuthController {
         description: "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv39"
     })
     @ApiCreatedResponse({
-        description: "Успешный выход из учетной записи"
+        schema: {
+            type: "object",
+            properties: {
+                message: {
+                    type: "string",
+                    example: "Успешный выход из учетной записи",
+                }
+            },
+            required: [
+                "message"
+            ]
+        }
     })
     @ApiUnauthorizedResponse({
-        description: "Возникла непредвиденная ошибка"
+        schema: {
+            type: "object",
+            properties: {
+                message: {
+                    type: "string",
+                    example: "Возникла непредвиденная ошибка",
+                }
+            },
+            required: [
+                "message"
+            ]
+        }
     })
     @UseGuards(JwtAuthGuard)
     @Delete("logout")
