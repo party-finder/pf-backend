@@ -46,6 +46,9 @@ export class AuthService {
     if (!user)
       throw new HttpException("Неверное имя пользователя или пароль", HttpStatus.BAD_REQUEST);
 
+    const activeUser = await this.tokenModel.findById({ _id: user._id })
+    if (activeUser) await activeUser.deleteOne({ _id: user._id })
+
     const validPass = await bcrypt.compare(password, user.password);
     if (!validPass)
       throw new HttpException("Неверное имя пользователя или пароль", HttpStatus.BAD_REQUEST);
