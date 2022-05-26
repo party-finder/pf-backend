@@ -16,11 +16,12 @@ import { AuthService } from "./auth.service";
 import { RefreshTokenDto } from "src/Models/dto/RefreshToken.dto";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 import { Response } from "express";
+import mongoose from "mongoose";
 
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @ApiOperation({})
   @ApiCreatedResponse({
@@ -100,12 +101,12 @@ export class AuthController {
     @Res()
     res: Response<
       | {
-        token: string;
-        refreshToken: string;
-      }
+          token: string;
+          refreshToken: string;
+        }
       | {
-        message: string;
-      }
+          message: string;
+        }
     >,
     @Body() loginDto: LoginDto
   ) {
@@ -165,11 +166,11 @@ export class AuthController {
     @Res()
     res: Response<
       | {
-        token: string;
-      }
+          token: string;
+        }
       | {
-        message: string;
-      }
+          message: string;
+        }
     >,
     @Body() refreshTokenDto: RefreshTokenDto
   ) {
@@ -220,10 +221,10 @@ export class AuthController {
   @Delete("logout")
   public async logout(
     @Res() res: Response<{ message: string }>,
-    @Req() req: { headers: { token: string } }
+    @Req() req: { user: { _id: mongoose.Types.ObjectId } }
   ) {
     try {
-      await this.authService.logout(req.headers);
+      await this.authService.logout(req.user._id);
       return res.status(HttpStatus.OK).json({
         message: "Успешный выход из учетной записи",
       });
