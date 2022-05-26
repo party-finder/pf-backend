@@ -5,6 +5,7 @@ import {
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiHeader,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -14,16 +15,12 @@ import { LoginDto } from "src/Models/dto/Login.dto";
 import { AuthService } from "./auth.service";
 import { RefreshTokenDto } from "src/Models/dto/RefreshToken.dto";
 import { JwtAuthGuard } from "./jwt-auth.guard";
-
-interface Response<T> {
-  status(arg0: number): any;
-  json(arg0: T): any;
-}
+import { Response } from "express";
 
 @ApiTags("auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @ApiOperation({})
   @ApiCreatedResponse({
@@ -54,15 +51,13 @@ export class AuthController {
   public async register(
     @Res() res: Response<{ message: string }>,
     @Body() registerDto: RegisterDto
-  ): Promise<{ message: string }> {
+  ) {
     try {
       await this.authService.register(registerDto);
-      console.log("dura");
       return res.status(HttpStatus.OK).json({
         message: "Пользователь успешно создан",
       });
     } catch (err) {
-      console.log("dura2");
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: err.response,
       });
@@ -70,7 +65,7 @@ export class AuthController {
   }
 
   @ApiOperation({})
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     schema: {
       type: "object",
       properties: {
@@ -105,12 +100,12 @@ export class AuthController {
     @Res()
     res: Response<
       | {
-          token: string;
-          refreshToken: string;
-        }
+        token: string;
+        refreshToken: string;
+      }
       | {
-          message: string;
-        }
+        message: string;
+      }
     >,
     @Body() loginDto: LoginDto
   ) {
@@ -128,7 +123,7 @@ export class AuthController {
   }
 
   @ApiOperation({})
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     schema: {
       type: "object",
       properties: {
@@ -170,11 +165,11 @@ export class AuthController {
     @Res()
     res: Response<
       | {
-          token: string;
-        }
+        token: string;
+      }
       | {
-          message: string;
-        }
+        message: string;
+      }
     >,
     @Body() refreshTokenDto: RefreshTokenDto
   ) {
@@ -197,7 +192,7 @@ export class AuthController {
     description:
       "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv39",
   })
-  @ApiCreatedResponse({
+  @ApiOkResponse({
     schema: {
       type: "object",
       properties: {
