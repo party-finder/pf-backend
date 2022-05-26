@@ -25,17 +25,16 @@ export class AuthService {
     @InjectModel(Token.name)
     private readonly tokenModel: Model<Token>,
     private jwtService: JwtService
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto): Promise<void> {
     const candidate = await this.userModel.findOne({ email: registerDto.email });
-    console.log(candidate)
     if (candidate)
       throw new HttpException("Такой пользователь уже существует", HttpStatus.BAD_REQUEST);
 
     const hashPassword = await bcrypt.hash(registerDto.password, 5);
 
-    const user = new this.userModel({ ...registerDto, password: hashPassword });
+    const user = new this.userModel({ ...registerDto, password: hashPassword, createdAt: this.setTime(0) });
     await user.save();
   }
 
@@ -69,8 +68,8 @@ export class AuthService {
       _id: user._id,
       token,
       refreshToken,
-      expireAt: this.setTokenTime(180),
-      createdAt: this.setTokenTime(0),
+      expireAt: this.setTime(180),
+      createdAt: this.setTime(0),
     });
     await authToken.save();
     return {
@@ -100,8 +99,8 @@ export class AuthService {
       {
         $set: {
           token: newToken,
-          expireAt: this.setTokenTime(180),
-          createdAt: this.setTokenTime(0),
+          expireAt: this.setTime(180),
+          createdAt: this.setTime(0),
         },
       }
     );
@@ -120,7 +119,7 @@ export class AuthService {
     return this.jwtService.sign({ _id: userId._id }, { expiresIn: expire, secret: secretKey });
   }
 
-  private setTokenTime(minutes: number): string {
+  private setTime(minutes: number): string {
     const copiedDate = new Date();
     copiedDate.setTime(copiedDate.getTime() + minutes * 60 * 1000);
     return copiedDate.toString();
