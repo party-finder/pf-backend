@@ -18,7 +18,6 @@ export class UsersService {
     }> {
         const user = await this.userModel.findById({ _id: userIdDecoder(token) });
         if (!user) throw new HttpException("Пользователь не найден", HttpStatus.BAD_REQUEST);
-        console.log('date', user.createdAt);
         const { username, email, createdAt } = user;
         return {
             username,

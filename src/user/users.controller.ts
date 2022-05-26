@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Req, Res, UseGuards } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiBasicAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBasicAuth, ApiOkResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { UsersService } from "./users.service";
