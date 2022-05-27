@@ -16,7 +16,7 @@ import { UserService } from "./user.service";
 @ApiTags("user")
 @Controller("user")
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @ApiOperation({})
   @ApiBasicAuth()
@@ -58,13 +58,13 @@ export class UserController {
     @Res()
     res: Response<
       | {
-          username: string;
-          email: string;
-          createdAt: string;
-        }
+        username: string;
+        email: string;
+        createdAt: string;
+      }
       | {
-          message: string;
-        }
+        message: string;
+      }
     >,
     @Req() req: { user: { _id: mongoose.Types.ObjectId } }
   ) {
@@ -90,34 +90,39 @@ export class UserController {
       properties: {
         lobbyId: {
           type: "string",
-          example: "Пользователь не найден",
+          example: "3wtwegvdbvewf12wqe",
         },
         title: {
           type: "string",
-          example: "Пользователь не найден",
+          example: "Заголовок",
         },
         description: {
           type: "string",
-          example: "Пользователь не найден",
+          example: "Комментарий к лобби",
         },
         game: {
           type: "string",
-          example: "Пользователь не найден",
+          example: "игра",
         },
         maxMembers: {
-          type: "string",
-          example: "Пользователь не найден",
+          type: "number",
+          example: 5,
         },
         createdAt: {
           type: "string",
-          example: "Пользователь не найден",
+          example: "Thu May 26 2022 19:51:02 GMT+0300 (Moscow Standard Time)",
         },
         user: {
-          type: "string",
-          example: "Пользователь не найден",
-        },
+          type: "object",
+          properties: {
+            username: {
+              type: "string",
+              example: "dura2"
+            }
+          }
+        }
       },
-      required: ["lobbyId"],
+      required: ["lobbyId", "title", "game", "maxMembers", "createdAt", "user"],
     },
   })
   @ApiBadRequestResponse({
@@ -158,3 +163,25 @@ export class UserController {
     }
   }
 }
+
+/*
+          type: "object",
+          properties: {
+            username: {
+              type: "string",
+              example: "durak",
+            },
+            email: {
+              type: "string",
+              example: "test@test.ru",
+            },
+            password: {
+              type: "string",
+              example: "somepass",
+            },
+            createdAt: {
+              type: "string",
+              example: "Thu May 26 2022 19:51:02 GMT+0300 (Moscow Standard Time)",
+            }
+          },
+*/

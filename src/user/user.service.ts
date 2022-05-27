@@ -14,7 +14,7 @@ export class UserService {
     @InjectModel(Group.name)
     private readonly groupModel: Model<Group>,
     private appService: AppService
-  ) {}
+  ) { }
 
   async getUser(_id: mongoose.Types.ObjectId): Promise<{
     username: string;
@@ -44,7 +44,7 @@ export class UserService {
       maxMembers,
       createdAt: this.appService.setTime(0),
       user: {
-        ...user,
+        username: user.username,
       },
     });
     await lobby.save();
