@@ -1,12 +1,14 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { MongooseModule } from "@nestjs/mongoose";
+import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
-import { UsersModule } from './user/users.module';
+import { UserModule } from "./user/user.module";
+import { GroupModule } from './group/group.module';
 
 @Module({
   controllers: [],
-  providers: [],
+  providers: [AppService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV || "production"}.env`,
@@ -14,8 +16,10 @@ import { UsersModule } from './user/users.module';
     MongooseModule.forRoot(
       `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_DATABASE}?authSource=admin`
     ),
-    AuthModule,
-    UsersModule,
-  ]
+    forwardRef(() => AuthModule),
+    forwardRef(() => GroupModule),
+    UserModule,
+  ],
+  exports: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
