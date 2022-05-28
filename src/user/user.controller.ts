@@ -9,61 +9,27 @@ import {
 import { Response } from "express";
 import mongoose from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { ErrorResponses } from "src/responses/ErrorResponses";
+import { InfoResponse } from "src/responses/UserResponses";
 import { UserService } from "./user.service";
 
 @ApiTags("user")
 @Controller("user")
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   @ApiOperation({})
   @ApiBasicAuth()
   @ApiOkResponse({
-    schema: {
-      type: "object",
-      properties: {
-        username: {
-          type: "string",
-          example: "dura2",
-        },
-        email: {
-          type: "string",
-          example: "test@test.ru",
-        },
-        createdAt: {
-          type: "string",
-          example: "Thu May 26 2022 19:29:10 GMT+0300 (Moscow Standard Time)",
-        },
-      },
-      required: ["username", "email", "createdAt"],
-    },
+    type: InfoResponse,
   })
   @ApiBadRequestResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Пользователь не найден",
-        },
-      },
-      required: ["message"],
-    },
+    type: ErrorResponses,
   })
   @UseGuards(JwtAuthGuard)
   @Get("info")
   async info(
-    @Res()
-    res: Response<
-      | {
-        username: string;
-        email: string;
-        createdAt: string;
-      }
-      | {
-        message: string;
-      }
-    >,
+    @Res() res: Response<InfoResponse | ErrorResponses>,
     @Req() req: { user: { _id: mongoose.Types.ObjectId } }
   ) {
     try {

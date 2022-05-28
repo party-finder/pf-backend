@@ -17,6 +17,13 @@ import { RefreshTokenDto } from "src/Models/dto/RefreshToken.dto";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 import { Response } from "express";
 import mongoose from "mongoose";
+import {
+  LoginResponse,
+  LogoutResponse,
+  RegisterResponse,
+  TokenResponse,
+} from "src/responses/AuthResponses";
+import { ErrorResponses } from "src/responses/ErrorResponses";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -25,32 +32,14 @@ export class AuthController {
 
   @ApiOperation({})
   @ApiCreatedResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Пользователь успешно создан",
-        },
-      },
-      required: ["message"],
-    },
+    type: RegisterResponse,
   })
   @ApiBadRequestResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Ошибка: Пользователь не был создан",
-        },
-      },
-      required: ["message"],
-    },
+    type: ErrorResponses,
   })
   @Post("register")
   public async register(
-    @Res() res: Response<{ message: string }>,
+    @Res() res: Response<RegisterResponse | ErrorResponses>,
     @Body() registerDto: RegisterDto
   ) {
     try {
@@ -67,47 +56,14 @@ export class AuthController {
 
   @ApiOperation({})
   @ApiOkResponse({
-    schema: {
-      type: "object",
-      properties: {
-        token: {
-          type: "string",
-          example:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv39",
-        },
-        refreshToken: {
-          type: "string",
-          example:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv3v8",
-        },
-      },
-      required: ["token", "refreshToken"],
-    },
+    type: LoginResponse,
   })
   @ApiBadRequestResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Ошибка: неверный логин или пароль",
-        },
-      },
-      required: ["message"],
-    },
+    type: ErrorResponses,
   })
   @Post("login")
   public async login(
-    @Res()
-    res: Response<
-      | {
-          token: string;
-          refreshToken: string;
-        }
-      | {
-          message: string;
-        }
-    >,
+    @Res() res: Response<LoginResponse | ErrorResponses>,
     @Body() loginDto: LoginDto
   ) {
     try {
@@ -125,53 +81,17 @@ export class AuthController {
 
   @ApiOperation({})
   @ApiOkResponse({
-    schema: {
-      type: "object",
-      properties: {
-        token: {
-          type: "string",
-          example:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv39",
-        },
-      },
-      required: ["token"],
-    },
+    type: TokenResponse,
   })
   @ApiUnauthorizedResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Вы не авторизованы, попробуйте снова",
-        },
-      },
-      required: ["message"],
-    },
+    type: ErrorResponses,
   })
   @ApiForbiddenResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Токен не найден",
-        },
-      },
-      required: ["message"],
-    },
+    type: ErrorResponses,
   })
   @Post("token")
   public async token(
-    @Res()
-    res: Response<
-      | {
-          token: string;
-        }
-      | {
-          message: string;
-        }
-    >,
+    @Res() res: Response<TokenResponse | ErrorResponses>,
     @Body() refreshTokenDto: RefreshTokenDto
   ) {
     try {
@@ -188,39 +108,16 @@ export class AuthController {
 
   @ApiOperation({})
   @ApiBasicAuth()
-  @ApiHeader({
-    name: "token",
-    description:
-      "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZmRjMjg1ZmM2OTk1ZTBmZTAxOGZlMWUiLCJpYXQiOjE2MDg0MzU5MjB9.U93_wqFcW95Rzf-gJakrq8mjsqwgrKpEBO34n6Kv39",
-  })
   @ApiOkResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Успешный выход из учетной записи",
-        },
-      },
-      required: ["message"],
-    },
+    type: LogoutResponse,
   })
   @ApiUnauthorizedResponse({
-    schema: {
-      type: "object",
-      properties: {
-        message: {
-          type: "string",
-          example: "Возникла непредвиденная ошибка",
-        },
-      },
-      required: ["message"],
-    },
+    type: ErrorResponses,
   })
   @UseGuards(JwtAuthGuard)
   @Delete("logout")
   public async logout(
-    @Res() res: Response<{ message: string }>,
+    @Res() res: Response<LogoutResponse | ErrorResponses>,
     @Req() req: { user: { _id: mongoose.Types.ObjectId } }
   ) {
     try {
