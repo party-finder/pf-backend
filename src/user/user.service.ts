@@ -2,19 +2,16 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { User } from "src/Models/User.schema";
+import { InfoResponse } from "src/responses/UserResponses";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name)
-    private readonly userModel: Model<User>,
-  ) { }
+    private readonly userModel: Model<User>
+  ) {}
 
-  async getUser(_id: mongoose.Types.ObjectId): Promise<{
-    username: string;
-    email: string;
-    createdAt: string;
-  }> {
+  async getUser(_id: mongoose.Types.ObjectId): Promise<InfoResponse> {
     const user = await this.userModel.findById({ _id });
     if (!user) throw new HttpException("Пользователь не найден", HttpStatus.BAD_REQUEST);
     const { username, email, createdAt } = user;
@@ -24,5 +21,4 @@ export class UserService {
       createdAt,
     };
   }
-
 }
