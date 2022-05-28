@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
 import { User } from "./User.schema";
 
@@ -21,10 +21,15 @@ export class Group {
   @Prop()
   createdAt: string;
 
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: User.name,
-  })
+  @Prop(raw({
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User.name,
+    },
+    username: {
+      type: String,
+    }
+  }))
   user: User;
 }
 

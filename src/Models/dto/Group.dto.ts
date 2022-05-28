@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import { User } from "../User.schema";
 
 export class GroupDto {
@@ -38,8 +38,8 @@ export class GroupDto {
     required: true,
   })
   @IsNumber()
-  @MinLength(2)
-  @MaxLength(24)
+  @Min(2)
+  @Max(24)
   @IsNotEmpty()
   readonly maxMembers: number;
 

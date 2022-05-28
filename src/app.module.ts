@@ -4,6 +4,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { AppService } from "./app.service";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
+import { GroupModule } from './group/group.module';
 
 @Module({
   controllers: [],
@@ -16,7 +17,8 @@ import { UserModule } from "./user/user.module";
       `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_URL}/${process.env.DB_DATABASE}?authSource=admin`
     ),
     forwardRef(() => AuthModule),
-    forwardRef(() => UserModule),
+    forwardRef(() => GroupModule),
+    UserModule,
   ],
   exports: [AppService],
 })
