@@ -9,6 +9,7 @@ import { Token } from "src/Models/Token.schema";
 import { LoginDto } from "src/Models/dto/Login.dto";
 import { RefreshTokenDto } from "src/Models/dto/RefreshToken.dto";
 import { AppService } from "src/app.service";
+import { LoginResponse, TokenResponse } from "src/responses/AuthResponses";
 
 type UserId = {
   _id: mongoose.Types.ObjectId;
@@ -28,7 +29,7 @@ export class AuthService {
     private readonly tokenModel: Model<Token>,
     private jwtService: JwtService,
     private appService: AppService
-  ) {}
+  ) { }
 
   async register({ username, email, password }: RegisterDto): Promise<void> {
     const candidate = await this.userModel.findOne({ email });
@@ -46,10 +47,7 @@ export class AuthService {
     await user.save();
   }
 
-  async login({ email, password }: LoginDto): Promise<{
-    token: string;
-    refreshToken: string;
-  }> {
+  async login({ email, password }: LoginDto): Promise<LoginResponse> {
     const user = await this.userModel.findOne({ email });
     if (!user)
       throw new HttpException("Неверное имя пользователя или пароль", HttpStatus.BAD_REQUEST);
@@ -89,7 +87,7 @@ export class AuthService {
     };
   }
 
-  async token({ refreshToken }: RefreshTokenDto): Promise<{ token: string }> {
+  async token({ refreshToken }: RefreshTokenDto): Promise<TokenResponse> {
     const refreshAuthToken: string | undefined = refreshToken;
     if (!refreshAuthToken)
       throw new HttpException("Вы не авторизованы, попробуйте снова", HttpStatus.UNAUTHORIZED);

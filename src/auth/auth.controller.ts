@@ -4,7 +4,6 @@ import {
   ApiBasicAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
