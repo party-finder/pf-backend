@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
@@ -15,6 +16,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
   getSchemaPath,
@@ -30,7 +32,7 @@ import { GroupService } from "./group.service";
 @ApiTags("group")
 @Controller("group")
 export class GroupController {
-  constructor(private groupService: GroupService) {}
+  constructor(private groupService: GroupService) { }
 
   @ApiOperation({})
   @ApiBasicAuth()
@@ -59,7 +61,7 @@ export class GroupController {
 
   @ApiOperation({})
   @ApiQuery({
-    name: "title",
+    name: "search",
     required: true,
     type: String,
     example: "title",
@@ -87,7 +89,7 @@ export class GroupController {
     @Res() res: Response<Array<CreateGroupResponse> | ErrorResponses>,
     @Query()
     query: {
-      title: string;
+      search: string;
       limit?: string;
       page?: string;
     }
@@ -98,6 +100,30 @@ export class GroupController {
     } catch (err) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: err.message,
+      });
+    }
+  }
+
+  @ApiOperation({ operationId: "{groupId}" })
+  @ApiParam({
+    name: "groupId",
+    required: true,
+    example: "oawkfoq2ef12321"
+  })
+  @ApiOkResponse({
+    type: CreateGroupResponse
+  })
+  @ApiBadRequestResponse({
+    type: ErrorResponses,
+  })
+  @Get(":groupId")
+  async getGroupById(@Res() res: Response<CreateGroupResponse | ErrorResponses>, @Param() param:{groupId:mongoose.Types.ObjectId}) {
+    try {
+      const group = await this.groupService.getGroup(param.groupId);
+      return res.status(HttpStatus.OK).json(group)
+    } catch {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        message: "По запросу ничего не найдено",
       });
     }
   }
