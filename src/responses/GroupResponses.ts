@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import mongoose from "mongoose";
+import { User } from "src/Models/User.schema";
 
 class UserInfoResponse {
   @ApiProperty({
@@ -54,6 +55,15 @@ export class CreateGroupResponse {
 
   @ApiProperty({
     type: UserInfoResponse,
+    required: true,
   })
   readonly user: UserInfoResponse;
+}
+
+export class JoinResponse extends CreateGroupResponse {
+  @ApiProperty({
+    type: [UserInfoResponse],
+    required: true,
+  })
+  readonly participants: [UserInfoResponse];
 }

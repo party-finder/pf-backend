@@ -5,7 +5,7 @@ import { AppService } from 'src/app.service';
 import { GroupDto } from 'src/Models/dto/Group.dto';
 import { Group } from 'src/Models/Group.schema';
 import { User } from 'src/Models/User.schema';
-import { CreateGroupResponse } from 'src/responses/GroupResponses';
+import { CreateGroupResponse, JoinResponse } from 'src/responses/GroupResponses';
 
 @Injectable()
 export class GroupService {
@@ -65,5 +65,32 @@ export class GroupService {
 
     async getGroup(groupId: mongoose.Types.ObjectId): Promise<CreateGroupResponse> {
         return await this.groupModel.findById({ _id: groupId });
+    }
+
+    async getAllUserGroups(userId: mongoose.Types.ObjectId): Promise<Array<CreateGroupResponse>> {
+        const groups = await this.groupModel.find({ "user._id": userId });
+        if (!groups.length) throw new HttpException("По запросу ничего не найдено", HttpStatus.NOT_FOUND);
+        return groups;
+    }
+
+    async addParticipant(userId: mongoose.Types.ObjectId, groupId: mongoose.Types.ObjectId): Promise<JoinResponse> {
+        const user = await this.userModel.findById({ _id: userId });
+        const group = await this.groupModel.findOneAndUpdate(
+            {
+                _id: groupId
+            },
+            {
+                $push: {
+                    participants: {
+                        _id: userId,
+                        username: user.username
+                    }
+                }
+            },
+            {
+                new: true
+            })
+        await group.save()
+        return group;
     }
 }
