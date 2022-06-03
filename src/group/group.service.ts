@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { AppService } from 'src/app.service';
 import { GroupDto } from 'src/Models/dto/Group.dto';
 import { Group } from 'src/Models/Group.schema';
 import { User } from 'src/Models/User.schema';
-import { CreateGroupResponse, JoinResponse } from 'src/responses/GroupResponses';
+import { CreateGroupResponse, MembersResponse } from 'src/responses/GroupResponses';
 
 @Injectable()
 export class GroupService {
@@ -19,7 +19,7 @@ export class GroupService {
 
     async createGroup(
         { title, description, game, maxMembers }: GroupDto,
-        _id: mongoose.Types.ObjectId
+        _id: Types.ObjectId
     ): Promise<CreateGroupResponse> {
         const user = await this.userModel.findById({ _id });
 
@@ -29,7 +29,7 @@ export class GroupService {
             game,
             maxMembers,
             createdAt: this.appService.setTime(0),
-            user: {
+            creator: {
                 _id: user._id,
                 username: user.username,
             },
@@ -63,17 +63,17 @@ export class GroupService {
         return result;
     }
 
-    async getGroup(groupId: mongoose.Types.ObjectId): Promise<CreateGroupResponse> {
+    async getGroup(groupId: Types.ObjectId): Promise<CreateGroupResponse> {
         return await this.groupModel.findById({ _id: groupId });
     }
 
-    async getAllUserGroups(userId: mongoose.Types.ObjectId): Promise<Array<CreateGroupResponse>> {
+    async getAllUserGroups(userId: Types.ObjectId): Promise<Array<CreateGroupResponse>> {
         const groups = await this.groupModel.find({ "user._id": userId });
         if (!groups.length) throw new HttpException("По запросу ничего не найдено", HttpStatus.NOT_FOUND);
         return groups;
     }
 
-    async addParticipant(userId: mongoose.Types.ObjectId, groupId: mongoose.Types.ObjectId): Promise<JoinResponse> {
+    async addParticipant(userId: Types.ObjectId, groupId: Types.ObjectId): Promise<MembersResponse> {
         const user = await this.userModel.findById({ _id: userId });
         const group = await this.groupModel.findOneAndUpdate(
             {
@@ -91,6 +91,33 @@ export class GroupService {
                 new: true
             })
         await group.save()
+        return group;
+    }
+
+    async addMember(groupId: Types.ObjectId, userId: Types.ObjectId): Promise<MembersResponse> {
+        const user = await this.userModel.findById({ _id: userId });
+        const group = await this.groupModel.findOneAndUpdate(
+            {
+                _id: groupId
+            },
+            {
+                $push: {
+                    members: {
+                        _id: userId,
+                        username: user.username
+                    }
+                },
+                $pull: {
+                    participants: {
+                        _id: userId,
+                        username: user.username
+                    }
+                }
+            },
+            {
+                new: true
+            }
+        )
         return group;
     }
 }

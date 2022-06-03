@@ -45,5 +45,5 @@ export class GroupDto {
 
   readonly createdAt: string;
 
-  readonly user: User;
+  readonly creator: User;
 }

@@ -22,11 +22,11 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Response } from "express";
-import mongoose from "mongoose";
+import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { GroupDto } from "src/Models/dto/Group.dto";
 import { ErrorResponses } from "src/responses/ErrorResponses";
-import { CreateGroupResponse, JoinResponse } from "src/responses/GroupResponses";
+import { CreateGroupResponse, MembersResponse } from "src/responses/GroupResponses";
 import { GroupService } from "./group.service";
 
 @ApiTags("group")
@@ -46,7 +46,7 @@ export class GroupController {
   @Post("create")
   async create(
     @Res() res: Response<CreateGroupResponse | ErrorResponses>,
-    @Req() req: { user: { _id: mongoose.Types.ObjectId } },
+    @Req() req: { user: { _id: Types.ObjectId } },
     @Body() groupDto: GroupDto
   ) {
     try {
@@ -104,7 +104,7 @@ export class GroupController {
     }
   }
 
-  @ApiOperation({ operationId: "{groupId}" })
+  @ApiOperation({ operationId: "groupId" })
   @ApiParam({
     name: "groupId",
     required: true,
@@ -117,7 +117,7 @@ export class GroupController {
     type: ErrorResponses,
   })
   @Get(":groupId")
-  async getGroupById(@Res() res: Response<CreateGroupResponse | ErrorResponses>, @Param() param: { groupId: mongoose.Types.ObjectId }) {
+  async getGroupById(@Res() res: Response<CreateGroupResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId }) {
     try {
       const group = await this.groupService.getGroup(param.groupId);
       return res.status(HttpStatus.OK).json(group)
@@ -128,7 +128,7 @@ export class GroupController {
     }
   }
 
-  @ApiOperation({ operationId: "search/{userId}" })
+  @ApiOperation({ operationId: "search/userId" })
   @ApiParam({
     name: "userId",
     required: true,
@@ -141,7 +141,7 @@ export class GroupController {
     type: ErrorResponses,
   })
   @Get("search/:userId")
-  async getAllCreatedParty(@Res() res: Response<Array<CreateGroupResponse> | ErrorResponses>, @Param() param: { userId: mongoose.Types.ObjectId }) {
+  async getAllCreatedParty(@Res() res: Response<Array<CreateGroupResponse> | ErrorResponses>, @Param() param: { userId: Types.ObjectId }) {
     try {
       const groups = await this.groupService.getAllUserGroups(param.userId)
       return res.status(HttpStatus.OK).json(groups)
@@ -151,25 +151,57 @@ export class GroupController {
       });
     }
   }
-
-  @ApiOperation({ operationId: "{groupId}/join" })
+  
+  @ApiOperation({ operationId: "groupId/join" })
   @ApiParam({
     name: "groupId",
     required: true,
     example: "egwegw4gwrbfsbhr"
   })
   @ApiOkResponse({
-    type: JoinResponse
+    type: MembersResponse
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
   })
+  @ApiBasicAuth()
   @UseGuards(JwtAuthGuard)
   @Put(":groupId/join")
-  async join(@Res() res: Response<JoinResponse | ErrorResponses>, @Req() req: { user: { _id: mongoose.Types.ObjectId } }, @Param() param: { groupId: mongoose.Types.ObjectId }) {
+  async join(@Res() res: Response<MembersResponse | ErrorResponses>, @Req() req: { user: { _id: Types.ObjectId } }, @Param() param: { groupId: Types.ObjectId }) {
     try {
-      const group = await this.groupService.addParticipant(req.user._id, param.groupId);
-      return res.status(HttpStatus.OK).json(group)
+      const newGroup = await this.groupService.addParticipant(req.user._id, param.groupId);
+      return res.status(HttpStatus.OK).json(newGroup)
+    } catch (err) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: err.message,
+      });
+    }
+  }
+
+  @ApiOperation({ operationId: "accept/groupId/userId" })
+  @ApiParam({
+    name: "groupId",
+    required: true,
+    example: "egwegw4gwrbfsbhr"
+  })
+  @ApiParam({
+    name: "groupId",
+    required: true,
+    example: "egwegw4gwrbfsbhr"
+  })
+  @ApiOkResponse({
+    type: MembersResponse
+  })
+  @ApiBadRequestResponse({
+    type: ErrorResponses,
+  })
+  @ApiBasicAuth()
+  @UseGuards(JwtAuthGuard)
+  @Put("accept/:groupId/:userId")
+  async accept(@Res() res: Response<MembersResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; }) {
+    try {
+      const newGroup = await this.groupService.addMember(param.groupId, param.userId)
+      return res.status(HttpStatus.OK).json(newGroup)
     } catch (err) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: err.message,
