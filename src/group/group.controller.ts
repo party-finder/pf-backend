@@ -26,7 +26,7 @@ import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { GroupDto } from "src/Models/dto/Group.dto";
 import { ErrorResponses } from "src/responses/ErrorResponses";
-import { CreateGroupResponse, MembersResponse } from "src/responses/GroupResponses";
+import { CreateGroupResponse, GroupResponse } from "src/responses/GroupResponses";
 import { GroupService } from "./group.service";
 
 @ApiTags("group")
@@ -79,14 +79,14 @@ export class GroupController {
     example: "1",
   })
   @ApiOkResponse({
-    type: [CreateGroupResponse],
+    type: [GroupResponse],
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
   })
   @Get("search")
   async search(
-    @Res() res: Response<Array<CreateGroupResponse> | ErrorResponses>,
+    @Res() res: Response<Array<GroupResponse> | ErrorResponses>,
     @Query()
     query: {
       search: string;
@@ -159,7 +159,7 @@ export class GroupController {
     example: "egwegw4gwrbfsbhr"
   })
   @ApiOkResponse({
-    type: MembersResponse
+    type: GroupResponse
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
@@ -167,7 +167,7 @@ export class GroupController {
   @ApiBasicAuth()
   @UseGuards(JwtAuthGuard)
   @Put(":groupId/join")
-  async join(@Res() res: Response<MembersResponse | ErrorResponses>, @Req() req: { user: { _id: Types.ObjectId } }, @Param() param: { groupId: Types.ObjectId }) {
+  async join(@Res() res: Response<GroupResponse | ErrorResponses>, @Req() req: { user: { _id: Types.ObjectId } }, @Param() param: { groupId: Types.ObjectId }) {
     try {
       const newGroup = await this.groupService.addParticipant(req.user._id, param.groupId);
       return res.status(HttpStatus.OK).json(newGroup)
@@ -190,7 +190,7 @@ export class GroupController {
     example: "egwegw4gwrbfsbhr"
   })
   @ApiOkResponse({
-    type: MembersResponse
+    type: GroupResponse
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
@@ -198,7 +198,7 @@ export class GroupController {
   @ApiBasicAuth()
   @UseGuards(JwtAuthGuard)
   @Put("accept/:groupId/:userId")
-  async accept(@Res() res: Response<MembersResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; }) {
+  async accept(@Res() res: Response<GroupResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; }) {
     try {
       const newGroup = await this.groupService.addMember(param.groupId, param.userId)
       return res.status(HttpStatus.OK).json(newGroup)

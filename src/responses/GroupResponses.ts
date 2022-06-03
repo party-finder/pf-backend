@@ -1,11 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import mongoose from "mongoose";
-import { User } from "src/Models/User.schema";
 
 class UserInfoResponse {
   @ApiProperty({
     example: "3wtwegvdbvewf12wqe",
     required: true,
+    type: String
   })
   readonly _id: mongoose.Types.ObjectId;
 
@@ -20,6 +20,7 @@ export class CreateGroupResponse {
   @ApiProperty({
     example: "3wtwegvdbvewf12wqe",
     required: true,
+    type: String
   })
   readonly _id: mongoose.Types.ObjectId;
 
@@ -60,7 +61,7 @@ export class CreateGroupResponse {
   readonly creator: UserInfoResponse;
 }
 
-export class MembersResponse extends CreateGroupResponse {
+export class GroupResponse extends CreateGroupResponse {
   @ApiProperty({
     type: [UserInfoResponse],
     required: true,
