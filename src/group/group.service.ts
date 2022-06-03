@@ -47,6 +47,7 @@ export class GroupService {
         let currentLimit: number = parseInt(limit);
         if (isNaN(currentPage)) currentPage = 1;
         if (isNaN(currentLimit)) currentLimit = 10;
+        if (currentLimit > 100) currentLimit = 100;
 
         const result = await this.groupModel
             .find({
@@ -58,7 +59,6 @@ export class GroupService {
             .sort({ createdAt: -1 })
             .skip((currentPage - 1) * currentLimit)
             .limit(currentLimit);
-        if (!result.length) throw new HttpException("По запросу ничего не найдено", HttpStatus.NOT_FOUND);
 
         return result;
     }
