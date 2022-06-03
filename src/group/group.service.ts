@@ -5,7 +5,7 @@ import { AppService } from 'src/app.service';
 import { GroupDto } from 'src/Models/dto/Group.dto';
 import { Group } from 'src/Models/Group.schema';
 import { User } from 'src/Models/User.schema';
-import { CreateGroupResponse, MembersResponse } from 'src/responses/GroupResponses';
+import { CreateGroupResponse, GroupResponse } from 'src/responses/GroupResponses';
 
 @Injectable()
 export class GroupService {
@@ -42,9 +42,10 @@ export class GroupService {
         search: string;
         limit?: string;
         page?: string
-    }): Promise<Array<CreateGroupResponse>> {
+    }): Promise<Array<GroupResponse>> {
         let currentPage: number = parseInt(page);
         let currentLimit: number = parseInt(limit);
+        const lowerCaseSearch = search.toLowerCase();
         if (isNaN(currentPage)) currentPage = 1;
         if (isNaN(currentLimit)) currentLimit = 10;
         if (currentLimit > 100) currentLimit = 100;
@@ -52,8 +53,8 @@ export class GroupService {
         const result = await this.groupModel
             .find({
                 $or: [
-                    { title: { $regex: search } },
-                    { game: { $regex: search } }
+                    { title: { $regex: lowerCaseSearch } },
+                    { game: { $regex: lowerCaseSearch } }
                 ]
             })
             .sort({ createdAt: -1 })
@@ -73,7 +74,7 @@ export class GroupService {
         return groups;
     }
 
-    async addParticipant(userId: Types.ObjectId, groupId: Types.ObjectId): Promise<MembersResponse> {
+    async addParticipant(userId: Types.ObjectId, groupId: Types.ObjectId): Promise<GroupResponse> {
         const user = await this.userModel.findById({ _id: userId });
         const group = await this.groupModel.findOneAndUpdate(
             {
@@ -94,7 +95,7 @@ export class GroupService {
         return group;
     }
 
-    async addMember(groupId: Types.ObjectId, userId: Types.ObjectId): Promise<MembersResponse> {
+    async addMember(groupId: Types.ObjectId, userId: Types.ObjectId): Promise<GroupResponse> {
         const user = await this.userModel.findById({ _id: userId });
         const group = await this.groupModel.findOneAndUpdate(
             {
