@@ -21,6 +21,19 @@ export class Group {
   @Prop()
   createdAt: string;
 
+  @Prop(raw([
+    {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: User.name,
+      },
+      username: {
+        type: String,
+      }
+    }
+  ]))
+  participants: [User]
+
   @Prop(raw({
     _id: {
       type: mongoose.Schema.Types.ObjectId,
