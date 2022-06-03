@@ -34,6 +34,19 @@ export class Group {
   ]))
   participants: [User]
 
+  @Prop(raw([
+    {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: User.name,
+      },
+      username: {
+        type: String,
+      }
+    }
+  ]))
+  members: [User]
+
   @Prop(raw({
     _id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -43,7 +56,7 @@ export class Group {
       type: String,
     }
   }))
-  user: User;
+  creator: User;
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);
