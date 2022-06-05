@@ -17,6 +17,13 @@ export class User {
 
   @Prop()
   createdAt: string;
+
+  @Prop({ type: Object })
+  contacts: {
+    discord: string | undefined;
+    skype: string | undefined;
+    teamspeak: string | undefined;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

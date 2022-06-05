@@ -1,6 +1,26 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class InfoResponse {
+class Contacts {
+  @ApiProperty({
+    example: "somediscord",
+    required: false,
+  })
+  readonly discord: string | undefined;
+
+  @ApiProperty({
+    example: "someskype",
+    required: false,
+  })
+  readonly skype: string | undefined;
+
+  @ApiProperty({
+    example: "someteamspeak",
+    required: false,
+  })
+  readonly teamspeak: string | undefined;
+}
+
+export class UserResponse {
   @ApiProperty({
     example: "dura2",
     required: true,
@@ -18,4 +38,10 @@ export class InfoResponse {
     required: true,
   })
   readonly createdAt: string;
+
+  @ApiProperty({
+    type: Contacts,
+    required: true,
+  })
+  readonly contacts: Contacts;
 }

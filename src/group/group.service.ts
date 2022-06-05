@@ -91,7 +91,6 @@ export class GroupService {
             {
                 new: true
             })
-        await group.save()
         return group;
     }
 
