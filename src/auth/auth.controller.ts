@@ -43,7 +43,7 @@ export class AuthController {
   ) {
     try {
       await this.authService.register(registerDto);
-      return res.status(HttpStatus.OK).json({
+      return res.status(HttpStatus.CREATED).json({
         message: "Пользователь успешно создан",
       });
     } catch (err) {

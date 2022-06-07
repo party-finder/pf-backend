@@ -51,7 +51,7 @@ export class GroupController {
   ) {
     try {
       const group = await this.groupService.createGroup(groupDto, req.user._id);
-      return res.status(HttpStatus.OK).json(group);
+      return res.status(HttpStatus.CREATED).json(group);
     } catch (err) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message: err.message,
