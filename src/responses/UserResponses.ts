@@ -40,6 +40,12 @@ export class UserResponse {
   readonly createdAt: string;
 
   @ApiProperty({
+    example: "Thu May 26 2022 19:29:10 GMT+0300 (Moscow Standard Time)",
+    required: true,
+  })
+  readonly lastOnline: string;
+
+  @ApiProperty({
     type: Contacts,
     required: true,
   })

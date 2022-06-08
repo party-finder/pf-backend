@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Put, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpStatus, Put, Req, Res, Session, UseGuards } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
   ApiBasicAuth,
@@ -8,7 +8,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { Response } from "express";
-import mongoose from "mongoose";
+import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { ContactsDto } from "src/Models/dto/Contacts.dto";
 import { ErrorResponses } from "src/responses/ErrorResponses";
@@ -32,7 +32,7 @@ export class UserController {
   @Get("info")
   async info(
     @Res() res: Response<UserResponse | ErrorResponses>,
-    @Req() req: { user: { _id: mongoose.Types.ObjectId } }
+    @Req() req: { user: { _id: Types.ObjectId } }
   ) {
     try {
       const user = await this.userService.getUser(req.user._id);

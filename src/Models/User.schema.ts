@@ -18,6 +18,9 @@ export class User {
   @Prop()
   createdAt: string;
 
+  @Prop()
+  lastOnline: string;
+
   @Prop({ type: Object })
   contacts: {
     discord: string | undefined;

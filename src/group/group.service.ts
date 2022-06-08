@@ -33,6 +33,10 @@ export class GroupService {
                 _id: user._id,
                 username: user.username,
             },
+            members: {
+                _id: user._id,
+                username: user.username,
+            },
         });
         await lobby.save();
         return lobby;
@@ -45,16 +49,16 @@ export class GroupService {
     }): Promise<Array<GroupResponse>> {
         let currentPage: number = parseInt(page);
         let currentLimit: number = parseInt(limit);
-        const lowerCaseSearch = search.toLowerCase();
         if (isNaN(currentPage)) currentPage = 1;
         if (isNaN(currentLimit)) currentLimit = 10;
         if (currentLimit > 100) currentLimit = 100;
+        console.log('safesfes',search);
 
         const result = await this.groupModel
             .find({
                 $or: [
-                    { title: { $regex: lowerCaseSearch } },
-                    { game: { $regex: lowerCaseSearch } }
+                    { title: { $regex: search, $options: "i" } },
+                    { game: { $regex: search, $options: "i" } }
                 ]
             })
             .sort({ createdAt: -1 })
@@ -64,7 +68,7 @@ export class GroupService {
         return result;
     }
 
-    async getGroup(groupId: Types.ObjectId): Promise<CreateGroupResponse> {
+    async getGroup(groupId: Types.ObjectId): Promise<GroupResponse> {
         return await this.groupModel.findById({ _id: groupId });
     }
 
@@ -76,7 +80,17 @@ export class GroupService {
 
     async addParticipant(userId: Types.ObjectId, groupId: Types.ObjectId): Promise<GroupResponse> {
         const user = await this.userModel.findById({ _id: userId });
-        const group = await this.groupModel.findOneAndUpdate(
+        const group = await this.groupModel.findById({ _id: groupId })
+
+        if (group.participants.find(el => el.username === user.username)) {
+            throw new HttpException("Пользователь уже добавлен в заявки", HttpStatus.BAD_REQUEST)
+        }
+
+        if (group.members.find(el => el.username === user.username)) {
+            throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
+        }
+
+        await this.groupModel.updateOne(
             {
                 _id: groupId
             },
@@ -90,13 +104,24 @@ export class GroupService {
             },
             {
                 new: true
-            })
+            }
+        )
         return group;
     }
 
     async addMember(groupId: Types.ObjectId, userId: Types.ObjectId): Promise<GroupResponse> {
         const user = await this.userModel.findById({ _id: userId });
-        const group = await this.groupModel.findOneAndUpdate(
+        const group = await this.groupModel.findById({ _id: groupId });
+
+        if (group.members.find(el => el.username === user.username)) {
+            throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
+        }
+
+        if (!!group.participants.find(el => el.username === user.username)) {
+            throw new HttpException("Заявка пользователя отсутствует", HttpStatus.BAD_REQUEST)
+        }
+
+        await this.groupModel.updateOne(
             {
                 _id: groupId
             },
@@ -120,4 +145,6 @@ export class GroupService {
         )
         return group;
     }
+
+
 }
