@@ -117,7 +117,7 @@ export class GroupService {
             throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
         }
 
-        if (!!group.participants.find(el => el.username === user.username)) {
+        if (!group.participants.find(el => el.username === user.username)) {
             throw new HttpException("Заявка пользователя отсутствует", HttpStatus.BAD_REQUEST)
         }
 
