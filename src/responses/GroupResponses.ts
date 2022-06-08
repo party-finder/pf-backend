@@ -59,6 +59,12 @@ export class CreateGroupResponse {
     required: true,
   })
   readonly creator: UserInfoResponse;
+
+  @ApiProperty({
+    type: [UserInfoResponse],
+    required: true,
+  })
+  readonly members: [UserInfoResponse];
 }
 
 export class GroupResponse extends CreateGroupResponse {
@@ -67,10 +73,4 @@ export class GroupResponse extends CreateGroupResponse {
     required: true,
   })
   readonly participants: [UserInfoResponse];
-
-  @ApiProperty({
-    type: [UserInfoResponse],
-    required: true,
-  })
-  readonly members: [UserInfoResponse];
 }

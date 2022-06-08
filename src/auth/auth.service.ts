@@ -43,6 +43,7 @@ export class AuthService {
       email,
       password: hashPassword,
       createdAt: this.appService.setTime(0),
+      lastOnline: this.appService.setTime(0),
       contacts:{}
     });
     await user.save();

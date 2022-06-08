@@ -111,13 +111,13 @@ export class GroupController {
     example: "oawkfoq2ef12321"
   })
   @ApiOkResponse({
-    type: CreateGroupResponse
+    type: GroupResponse
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
   })
   @Get(":groupId")
-  async getGroupById(@Res() res: Response<CreateGroupResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId }) {
+  async getGroupById(@Res() res: Response<GroupResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId }) {
     try {
       const group = await this.groupService.getGroup(param.groupId);
       return res.status(HttpStatus.OK).json(group)

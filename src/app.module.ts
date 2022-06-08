@@ -18,8 +18,8 @@ import { GroupModule } from './group/group.module';
     ),
     forwardRef(() => AuthModule),
     forwardRef(() => GroupModule),
-    UserModule,
+    forwardRef(() => UserModule),
   ],
   exports: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
