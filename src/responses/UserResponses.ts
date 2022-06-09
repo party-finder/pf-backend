@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Types } from "mongoose";
 
 class Contacts {
   @ApiProperty({
@@ -21,6 +22,14 @@ class Contacts {
 }
 
 export class UserResponse {
+
+  @ApiProperty({
+    example: "3wtwegvdbvewf12wqe",
+    required: true,
+    type: String
+  })
+  readonly _id: Types.ObjectId
+
   @ApiProperty({
     example: "dura2",
     required: true,

@@ -42,6 +42,9 @@ export class Group {
       },
       username: {
         type: String,
+      },
+      lastOnline: {
+        type: String,
       }
     }
   ]))
