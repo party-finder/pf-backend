@@ -182,7 +182,9 @@ export class GroupService {
                 }
             )
             return newGroup;
-        } else {
+        }
+        
+        if (group.participants.find(participant => participant.username === user.username)) {
             const newGroup = await this.groupModel.findByIdAndUpdate(
                 { _id: groupId },
                 {
