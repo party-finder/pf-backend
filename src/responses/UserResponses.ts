@@ -46,7 +46,7 @@ export class UserResponse {
     example: "Thu May 26 2022 19:29:10 GMT+0300 (Moscow Standard Time)",
     required: true,
   })
-  readonly createdAt: string;
+  readonly createdAt: Date;
 
   @ApiProperty({
     example: "Thu May 26 2022 19:29:10 GMT+0300 (Moscow Standard Time)",

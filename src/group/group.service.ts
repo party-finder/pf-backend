@@ -82,11 +82,11 @@ export class GroupService {
         const user = await this.userModel.findById({ _id: userId });
         const group = await this.groupModel.findById({ _id: groupId })
 
-        if (group.participants.find(el => el.username === user.username)) {
+        if (group.participants.find(participant => participant.username === user.username)) {
             throw new HttpException("Пользователь уже добавлен в заявки", HttpStatus.BAD_REQUEST)
         }
 
-        if (group.members.find(el => el.username === user.username)) {
+        if (group.members.find(member => member.username === user.username)) {
             throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
         }
 
@@ -118,11 +118,11 @@ export class GroupService {
             throw new HttpException("Только владелец группы может добавлять пользователей", HttpStatus.BAD_REQUEST)
         }
 
-        if (group.members.find(el => el.username === user.username)) {
+        if (group.members.find(member => member.username === user.username)) {
             throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
         }
 
-        if (!group.participants.find(el => el.username === user.username)) {
+        if (!group.participants.find(participant => participant.username === user.username)) {
             throw new HttpException("Заявка пользователя отсутствует", HttpStatus.BAD_REQUEST)
         }
 
@@ -161,11 +161,11 @@ export class GroupService {
             throw new HttpException("Только владелец группы может удалять пользователей", HttpStatus.BAD_REQUEST)
         }
 
-        if (!group.members.find(el => el.username === user.username) && !group.participants.find(el => el.username === user.username)) {
+        if (!group.members.find(member => member.username === user.username) && !group.participants.find(participant => participant.username === user.username)) {
             throw new HttpException("Пользователь не найден", HttpStatus.BAD_REQUEST)
         }
 
-        if (group.members.find(el => el.username === user.username)) {
+        if (group.members.find(member => member.username === user.username)) {
             const newGroup = await this.groupModel.findByIdAndUpdate(
                 { _id: groupId },
                 {

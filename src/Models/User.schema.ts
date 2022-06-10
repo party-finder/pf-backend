@@ -16,7 +16,7 @@ export class User {
   password: string;
 
   @Prop()
-  createdAt: string;
+  createdAt: Date;
 
   @Prop()
   lastOnline: string;

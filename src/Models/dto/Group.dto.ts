@@ -43,7 +43,7 @@ export class GroupDto {
   @IsNotEmpty()
   readonly maxMembers: number;
 
-  readonly createdAt: string;
+  readonly createdAt: Date;
 
   readonly creator: User;
 }

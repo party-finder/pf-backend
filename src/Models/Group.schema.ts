@@ -19,7 +19,7 @@ export class Group {
   maxMembers: number;
 
   @Prop()
-  createdAt: string;
+  createdAt: Date;
 
   @Prop(raw([
     {
