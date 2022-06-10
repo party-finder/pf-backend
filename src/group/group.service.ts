@@ -173,7 +173,6 @@ export class GroupService {
                         members: {
                             _id: userId,
                             username: user.username,
-                            lastOnline: user.lastOnline
                         }
                     }
                 },
@@ -182,17 +181,14 @@ export class GroupService {
                 }
             )
             return newGroup;
-        }
-        
-        if (group.participants.find(participant => participant.username === user.username)) {
+        } else {
             const newGroup = await this.groupModel.findByIdAndUpdate(
                 { _id: groupId },
                 {
                     $pull: {
                         participants: {
                             _id: userId,
-                            username: user.username,
-                            lastOnline: user.lastOnline
+                            username: user.username
                         }
                     }
                 },
