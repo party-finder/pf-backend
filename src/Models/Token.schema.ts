@@ -11,10 +11,10 @@ export class Token {
   refreshToken: string;
 
   @Prop()
-  expireAt: string;
+  expireAt: Date;
 
   @Prop()
-  createdAt: string;
+  createdAt: Date;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);

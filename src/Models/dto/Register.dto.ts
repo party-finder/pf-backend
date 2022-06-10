@@ -38,5 +38,5 @@ export class RegisterDto {
     @IsNotEmpty()
     readonly password: string;
 
-    readonly createdAt: string;
+    readonly createdAt: Date;
 }

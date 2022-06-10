@@ -60,7 +60,7 @@ export class GroupResponse {
     example: "Thu May 26 2022 19:51:02 GMT+0300 (Moscow Standard Time)",
     required: true,
   })
-  readonly createdAt: string;
+  readonly createdAt: Date;
 
   @ApiProperty({
     type: UserInfoResponse,
