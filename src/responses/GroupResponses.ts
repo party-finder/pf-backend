@@ -16,7 +16,15 @@ class UserInfoResponse {
   readonly username: string;
 }
 
-export class CreateGroupResponse {
+class UserOnlineResponse extends UserInfoResponse{
+  @ApiProperty({
+    example: "Thu May 26 2022 19:51:02 GMT+0300 (Moscow Standard Time)",
+    required: true,
+  })
+  readonly lastOnline: string;
+}
+
+export class GroupResponse {
   @ApiProperty({
     example: "3wtwegvdbvewf12wqe",
     required: true,
@@ -61,13 +69,11 @@ export class CreateGroupResponse {
   readonly creator: UserInfoResponse;
 
   @ApiProperty({
-    type: [UserInfoResponse],
+    type: [UserOnlineResponse],
     required: true,
   })
-  readonly members: [UserInfoResponse];
-}
+  readonly members: [UserOnlineResponse];
 
-export class GroupResponse extends CreateGroupResponse {
   @ApiProperty({
     type: [UserInfoResponse],
     required: true,

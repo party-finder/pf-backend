@@ -26,7 +26,7 @@ import { Types } from "mongoose";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { GroupDto } from "src/Models/dto/Group.dto";
 import { ErrorResponses } from "src/responses/ErrorResponses";
-import { CreateGroupResponse, GroupResponse } from "src/responses/GroupResponses";
+import { GroupResponse } from "src/responses/GroupResponses";
 import { GroupService } from "./group.service";
 
 @ApiTags("group")
@@ -37,7 +37,7 @@ export class GroupController {
   @ApiOperation({})
   @ApiBasicAuth()
   @ApiCreatedResponse({
-    type: CreateGroupResponse,
+    type: GroupResponse,
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
@@ -45,7 +45,7 @@ export class GroupController {
   @UseGuards(JwtAuthGuard)
   @Post("create")
   async create(
-    @Res() res: Response<CreateGroupResponse | ErrorResponses>,
+    @Res() res: Response<GroupResponse | ErrorResponses>,
     @Req() req: { user: { _id: Types.ObjectId } },
     @Body() groupDto: GroupDto
   ) {
@@ -135,13 +135,13 @@ export class GroupController {
     example: "oawkfoq2ef1232safw1"
   })
   @ApiOkResponse({
-    type: [CreateGroupResponse]
+    type: [GroupResponse]
   })
   @ApiBadRequestResponse({
     type: ErrorResponses,
   })
   @Get("search/:userId")
-  async getAllCreatedParty(@Res() res: Response<Array<CreateGroupResponse> | ErrorResponses>, @Param() param: { userId: Types.ObjectId }) {
+  async getAllCreatedParty(@Res() res: Response<Array<GroupResponse> | ErrorResponses>, @Param() param: { userId: Types.ObjectId }) {
     try {
       const groups = await this.groupService.getAllUserGroups(param.userId)
       return res.status(HttpStatus.OK).json(groups)
@@ -151,7 +151,7 @@ export class GroupController {
       });
     }
   }
-  
+
   @ApiOperation({ operationId: "groupId/join" })
   @ApiParam({
     name: "groupId",
@@ -185,7 +185,7 @@ export class GroupController {
     example: "egwegw4gwrbfsbhr"
   })
   @ApiParam({
-    name: "groupId",
+    name: "userId",
     required: true,
     example: "egwegw4gwrbfsbhr"
   })
@@ -198,9 +198,47 @@ export class GroupController {
   @ApiBasicAuth()
   @UseGuards(JwtAuthGuard)
   @Put("accept/:groupId/:userId")
-  async accept(@Res() res: Response<GroupResponse | ErrorResponses>, @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; }) {
+  async accept(
+    @Res() res: Response<GroupResponse | ErrorResponses>,
+    @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; },
+    @Req() req: { user: { _id: Types.ObjectId } }
+  ) {
     try {
-      const newGroup = await this.groupService.addMember(param.groupId, param.userId)
+      const newGroup = await this.groupService.addMember(param.groupId, param.userId, req.user._id)
+      return res.status(HttpStatus.OK).json(newGroup)
+    } catch (err) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: err.message,
+      });
+    }
+  }
+
+  @ApiOperation({ operationId: "kick/groupId/userId" })
+  @ApiParam({
+    name: "groupId",
+    required: true,
+    example: "egwegw4gwrbfsbhr"
+  })
+  @ApiParam({
+    name: "userId",
+    required: true,
+    example: "egwegw4gwrbfsbhr"
+  })
+  @ApiOkResponse({
+    type: GroupResponse
+  })
+  @ApiBadRequestResponse({
+    type: ErrorResponses,
+  })
+  @ApiBasicAuth()
+  @UseGuards(JwtAuthGuard)
+  @Put("kick/:groupId/:userId")
+  async kick(
+    @Res() res: Response<GroupResponse | ErrorResponses>,
+    @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; },
+    @Req() req: { user: { _id: Types.ObjectId } }) {
+    try {
+      const newGroup = await this.groupService.deleteUser(param.groupId, param.userId, req.user._id)
       return res.status(HttpStatus.OK).json(newGroup)
     } catch (err) {
       return res.status(HttpStatus.BAD_REQUEST).json({

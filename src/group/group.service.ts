@@ -5,7 +5,7 @@ import { AppService } from 'src/app.service';
 import { GroupDto } from 'src/Models/dto/Group.dto';
 import { Group } from 'src/Models/Group.schema';
 import { User } from 'src/Models/User.schema';
-import { CreateGroupResponse, GroupResponse } from 'src/responses/GroupResponses';
+import { GroupResponse } from 'src/responses/GroupResponses';
 
 @Injectable()
 export class GroupService {
@@ -20,7 +20,7 @@ export class GroupService {
     async createGroup(
         { title, description, game, maxMembers }: GroupDto,
         _id: Types.ObjectId
-    ): Promise<CreateGroupResponse> {
+    ): Promise<GroupResponse> {
         const user = await this.userModel.findById({ _id });
 
         const lobby = new this.groupModel({
@@ -36,6 +36,7 @@ export class GroupService {
             members: {
                 _id: user._id,
                 username: user.username,
+                lastOnline: user.lastOnline
             },
         });
         await lobby.save();
@@ -52,7 +53,6 @@ export class GroupService {
         if (isNaN(currentPage)) currentPage = 1;
         if (isNaN(currentLimit)) currentLimit = 10;
         if (currentLimit > 100) currentLimit = 100;
-        console.log('safesfes',search);
 
         const result = await this.groupModel
             .find({
@@ -72,7 +72,7 @@ export class GroupService {
         return await this.groupModel.findById({ _id: groupId });
     }
 
-    async getAllUserGroups(userId: Types.ObjectId): Promise<Array<CreateGroupResponse>> {
+    async getAllUserGroups(userId: Types.ObjectId): Promise<Array<GroupResponse>> {
         const groups = await this.groupModel.find({ "user._id": userId });
         if (!groups.length) throw new HttpException("По запросу ничего не найдено", HttpStatus.NOT_FOUND);
         return groups;
@@ -90,7 +90,7 @@ export class GroupService {
             throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
         }
 
-        await this.groupModel.updateOne(
+        const newGroup = await this.groupModel.findByIdAndUpdate(
             {
                 _id: groupId
             },
@@ -106,12 +106,17 @@ export class GroupService {
                 new: true
             }
         )
-        return group;
+
+        return newGroup;
     }
 
-    async addMember(groupId: Types.ObjectId, userId: Types.ObjectId): Promise<GroupResponse> {
+    async addMember(groupId: Types.ObjectId, userId: Types.ObjectId, _id: Types.ObjectId): Promise<GroupResponse> {
         const user = await this.userModel.findById({ _id: userId });
         const group = await this.groupModel.findById({ _id: groupId });
+
+        if (group.creator._id.toString() !== _id.toString()) {
+            throw new HttpException("Только владелец группы может добавлять пользователей", HttpStatus.BAD_REQUEST)
+        }
 
         if (group.members.find(el => el.username === user.username)) {
             throw new HttpException("Пользователь уже часть группы", HttpStatus.BAD_REQUEST)
@@ -121,7 +126,7 @@ export class GroupService {
             throw new HttpException("Заявка пользователя отсутствует", HttpStatus.BAD_REQUEST)
         }
 
-        await this.groupModel.updateOne(
+        const newGroup = await this.groupModel.findByIdAndUpdate(
             {
                 _id: groupId
             },
@@ -129,7 +134,8 @@ export class GroupService {
                 $push: {
                     members: {
                         _id: userId,
-                        username: user.username
+                        username: user.username,
+                        lastOnline: user.lastOnline
                     }
                 },
                 $pull: {
@@ -143,8 +149,56 @@ export class GroupService {
                 new: true
             }
         )
-        return group;
+
+        return newGroup;
     }
 
+    async deleteUser(groupId: Types.ObjectId, userId: Types.ObjectId, _id: Types.ObjectId): Promise<GroupResponse> {
+        const user = await this.userModel.findById({ _id: userId });
+        const group = await this.groupModel.findById({ _id: groupId });
 
+        if (group.creator._id.toString() !== _id.toString()) {
+            throw new HttpException("Только владелец группы может удалять пользователей", HttpStatus.BAD_REQUEST)
+        }
+
+        if (!group.members.find(el => el.username === user.username) && !group.participants.find(el => el.username === user.username)) {
+            throw new HttpException("Пользователь не найден", HttpStatus.BAD_REQUEST)
+        }
+
+        if (group.members.find(el => el.username === user.username)) {
+            const newGroup = await this.groupModel.findByIdAndUpdate(
+                { _id: groupId },
+                {
+                    $pull: {
+                        members: {
+                            _id: userId,
+                            username: user.username,
+                            lastOnline: user.lastOnline
+                        }
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+            return newGroup;
+        } else {
+            const newGroup = await this.groupModel.findByIdAndUpdate(
+                { _id: groupId },
+                {
+                    $pull: {
+                        participants: {
+                            _id: userId,
+                            username: user.username,
+                            lastOnline: user.lastOnline
+                        }
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+            return newGroup;
+        }
+    }
 }
