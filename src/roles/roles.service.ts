@@ -30,7 +30,7 @@ export class RolesService {
         const role = await this.roleModel.findById({ _id: roleId });
         const user = await this.userModel.findById({ _id: userId })
         if (user.roles.find(userRole => userRole.value === role.value)) throw new HttpException("Такая роль у пользователя уже есть", HttpStatus.BAD_REQUEST)
-        await await this.userModel.updateOne(
+        await this.userModel.updateOne(
             {
                 _id: userId
             },
