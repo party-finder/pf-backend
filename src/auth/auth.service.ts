@@ -10,9 +10,11 @@ import { LoginDto } from "src/Models/dto/Login.dto";
 import { RefreshTokenDto } from "src/Models/dto/RefreshToken.dto";
 import { AppService } from "src/app.service";
 import { LoginResponse, TokenResponse } from "src/responses/AuthResponses";
+import { Role } from "src/Models/Role.schema";
 
-type UserId = {
+type TokenPayload = {
   _id: mongoose.Types.ObjectId;
+  roles: Array<Role>
 };
 
 type Options = {
@@ -27,6 +29,8 @@ export class AuthService {
     private readonly userModel: Model<User>,
     @InjectModel(Token.name)
     private readonly tokenModel: Model<Token>,
+    @InjectModel(Role.name)
+    private readonly roleModel: Model<Role>,
     private jwtService: JwtService,
     private appService: AppService
   ) { }
@@ -38,21 +42,44 @@ export class AuthService {
 
     const hashPassword = await bcrypt.hash(password, 5);
 
+    const userRole = await this.roleModel.findOne({ value: "user" });
+
     const user = new this.userModel({
       username,
       email,
       password: hashPassword,
       createdAt: this.appService.setTime(0),
       lastOnline: this.appService.setTime(0),
-      contacts:{}
+      isBanned: false,
+      roles: [{
+        _id: userRole._id,
+        value: userRole.value
+      }]
     });
+
     await user.save();
+
+    await this.roleModel.findOneAndUpdate(
+      {
+        value: "user"
+      },
+      {
+        $push: {
+          users: {
+            _id: user._id
+          }
+        }
+      },
+      { new: true }
+    )
   }
 
   async login({ email, password }: LoginDto): Promise<LoginResponse> {
     const user = await this.userModel.findOne({ email });
     if (!user)
       throw new HttpException("Неверное имя пользователя или пароль", HttpStatus.BAD_REQUEST);
+
+    if (user.isBanned) throw new HttpException("Вы забанены", HttpStatus.FORBIDDEN)
 
     const activeUser = await this.tokenModel.findById({ _id: user._id })
     if (activeUser) await activeUser.deleteOne({ _id: user._id })
@@ -62,14 +89,20 @@ export class AuthService {
       throw new HttpException("Неверное имя пользователя или пароль", HttpStatus.BAD_REQUEST);
 
     const token = this.generateToken(
-      { _id: user._id },
+      {
+        _id: user._id,
+        roles: user.roles
+      },
       {
         expire: "3h",
         secretKey: process.env.SECRET || "secret",
       }
     );
     const refreshToken = this.generateToken(
-      { _id: user._id },
+      {
+        _id: user._id,
+        roles: user.roles
+      },
       {
         expire: "30d",
         secretKey: process.env.REFRESH || "refresh",
@@ -94,13 +127,17 @@ export class AuthService {
     if (!refreshAuthToken)
       throw new HttpException("Вы не авторизованы, попробуйте снова", HttpStatus.UNAUTHORIZED);
 
+    const decodedToken = this.tokenDecoder(refreshAuthToken);
     const userToken = await this.tokenModel.findOne({
-      _id: this.userIdDecoder(refreshAuthToken),
+      _id: decodedToken._id,
     });
     if (!userToken) throw new HttpException("Токен не найден", HttpStatus.FORBIDDEN);
 
     const newToken = this.generateToken(
-      { _id: userToken._id },
+      {
+        _id: userToken._id,
+        roles: decodedToken.roles
+      },
       {
         expire: "3h",
         secretKey: process.env.SECRET || "secret",
@@ -128,19 +165,18 @@ export class AuthService {
     await this.tokenModel.deleteOne({ _id });
   }
 
-  private generateToken(userId: UserId, { expire, secretKey }: Options): string {
-    return this.jwtService.sign({ _id: userId._id }, { expiresIn: expire, secret: secretKey });
+  private generateToken(payload: TokenPayload, { expire, secretKey }: Options): string {
+    return this.jwtService.sign(payload, { expiresIn: expire, secret: secretKey });
   }
 
-  private userIdDecoder(token: string | undefined): string {
-    if (!token) return "";
-    let decodedId: any = "";
+  private tokenDecoder(token: string): TokenPayload {
+    let decodedId = "";
     if (token.split(" ").length === 1) {
       decodedId = token.split(".")[1];
     } else {
       decodedId = token.split(" ")[1].split(".")[1];
     }
     decodedId = Buffer.from(decodedId, "base64").toString("binary");
-    return JSON.parse(decodedId)._id;
+    return JSON.parse(decodedId);
   }
 }

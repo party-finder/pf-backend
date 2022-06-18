@@ -21,6 +21,12 @@ export class Group {
   @Prop()
   createdAt: Date;
 
+  @Prop()
+  isBanned: boolean;
+
+  @Prop()
+  isActive: boolean;
+
   @Prop(raw([
     {
       _id: {

@@ -49,6 +49,12 @@ export class UserResponse {
   readonly createdAt: Date;
 
   @ApiProperty({
+    example: false,
+    required: true
+  })
+  readonly isBanned: boolean;
+
+  @ApiProperty({
     example: "Thu May 26 2022 19:29:10 GMT+0300 (Moscow Standard Time)",
     required: true,
   })

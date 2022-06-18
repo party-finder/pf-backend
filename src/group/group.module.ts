@@ -17,6 +17,9 @@ import { UserModule } from 'src/user/user.module';
     UserModule
   ],
   providers: [GroupService],
-  controllers: [GroupController]
+  controllers: [GroupController],
+  exports:[
+    MongooseModule
+  ]
 })
 export class GroupModule { }

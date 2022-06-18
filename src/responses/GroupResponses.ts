@@ -16,7 +16,7 @@ class UserInfoResponse {
   readonly username: string;
 }
 
-class UserOnlineResponse extends UserInfoResponse{
+class UserOnlineResponse extends UserInfoResponse {
   @ApiProperty({
     example: "Thu May 26 2022 19:51:02 GMT+0300 (Moscow Standard Time)",
     required: true,
@@ -49,6 +49,18 @@ export class GroupResponse {
     required: true,
   })
   readonly game: string;
+
+  @ApiProperty({
+    example: false,
+    required: true
+  })
+  readonly isBanned: boolean;
+
+  @ApiProperty({
+    example: true,
+    required: true
+  })
+  readonly isActive: boolean;
 
   @ApiProperty({
     example: 5,
