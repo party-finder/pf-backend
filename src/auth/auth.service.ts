@@ -50,6 +50,7 @@ export class AuthService {
       password: hashPassword,
       createdAt: this.appService.setTime(0),
       lastOnline: this.appService.setTime(0),
+      isBanned: false,
       roles: [{
         _id: userRole._id,
         value: userRole.value
@@ -77,6 +78,8 @@ export class AuthService {
     const user = await this.userModel.findOne({ email });
     if (!user)
       throw new HttpException("Неверное имя пользователя или пароль", HttpStatus.BAD_REQUEST);
+
+    if (user.isBanned) throw new HttpException("Вы забанены", HttpStatus.FORBIDDEN)
 
     const activeUser = await this.tokenModel.findById({ _id: user._id })
     if (activeUser) await activeUser.deleteOne({ _id: user._id })

@@ -22,6 +22,9 @@ export class User {
   @Prop()
   lastOnline: string;
 
+  @Prop()
+  isBanned: boolean;
+
   @Prop({ type: Object })
   contacts: {
     discord: string | undefined;

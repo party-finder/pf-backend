@@ -29,6 +29,8 @@ export class GroupService {
             game,
             maxMembers,
             createdAt: this.appService.setTime(0),
+            isBanned: false,
+            isActive: true,
             creator: {
                 _id: user._id,
                 username: user.username,
@@ -57,8 +59,14 @@ export class GroupService {
         const result = await this.groupModel
             .find({
                 $or: [
-                    { title: { $regex: search, $options: "i" } },
-                    { game: { $regex: search, $options: "i" } }
+                    {
+                        title: { $regex: search, $options: "i" },
+                        isBanned: false
+                    },
+                    {
+                        game: { $regex: search, $options: "i" },
+                        isBanned: false
+                    }
                 ]
             })
             .sort({ createdAt: -1 })
@@ -198,5 +206,26 @@ export class GroupService {
             )
             return newGroup;
         }
+    }
+
+    async closeGroup(groupId: Types.ObjectId, userId: Types.ObjectId):Promise<GroupResponse> {
+        const group = await this.groupModel.findById({ _id: groupId })
+        if (group.creator._id.toString() !== userId.toString())
+            throw new HttpException("Не вышло закрыть группу", HttpStatus.BAD_REQUEST)
+
+        const newGroup = await this.groupModel.findByIdAndUpdate(
+            {
+                _id: groupId
+            },
+            {
+                $set: {
+                    isActive: false
+                }
+            },
+            {
+                new: true
+            }
+        )
+        return newGroup
     }
 }

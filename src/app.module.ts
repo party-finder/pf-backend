@@ -6,6 +6,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { GroupModule } from './group/group.module';
 import { RolesModule } from './roles/roles.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   controllers: [],
@@ -21,6 +22,7 @@ import { RolesModule } from './roles/roles.module';
     forwardRef(() => GroupModule),
     forwardRef(() => UserModule),
     RolesModule,
+    AdminModule,
   ],
   exports: [AppService],
 })

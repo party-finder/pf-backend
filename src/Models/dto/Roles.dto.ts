@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class RolesDto {
     @ApiProperty({
-        example: "user",
+        example: "admin",
         minLength: 1,
         maxLength: 24,
         required: true

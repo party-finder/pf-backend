@@ -6,7 +6,7 @@ export type RoleDocument = Role & Document;
 
 @Schema()
 export class Role {
-    @Prop()
+    @Prop({ unique: true })
     value: string;
 
     @Prop()
