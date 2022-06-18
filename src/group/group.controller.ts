@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -232,7 +233,7 @@ export class GroupController {
   })
   @ApiBasicAuth()
   @UseGuards(JwtAuthGuard)
-  @Put("kick/:groupId/:userId")
+  @Delete("kick/:groupId/:userId")
   async kick(
     @Res() res: Response<GroupResponse | ErrorResponses>,
     @Param() param: { groupId: Types.ObjectId; userId: Types.ObjectId; },

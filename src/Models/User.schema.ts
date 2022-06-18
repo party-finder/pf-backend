@@ -1,5 +1,6 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose from "mongoose";
+import { Role } from "./Role.schema";
 
 export type UserDocument = User & Document;
 
@@ -27,6 +28,17 @@ export class User {
     skype: string | undefined;
     teamspeak: string | undefined;
   }
+
+  @Prop(raw([{
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Role.name,
+    },
+    value: {
+      type: String,
+    }
+  }]))
+  roles: [Role]
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

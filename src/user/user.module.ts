@@ -18,4 +18,4 @@ import { AppModule } from "src/app.module";
   controllers: [UserController],
   exports: [MongooseModule],
 })
-export class UserModule {}
+export class UserModule { }

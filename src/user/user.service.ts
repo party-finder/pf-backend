@@ -28,21 +28,11 @@ export class UserService {
   }
 
   async addContacts(_id: Types.ObjectId, contacts: ContactsDto): Promise<UserResponse> {
-    const user = await this.userModel.findById({ _id })
-    if (Object.values(contacts).every(el => !el)) throw new HttpException("Неверно переданы значения", HttpStatus.BAD_REQUEST)
-
-    const newContacts = user.contacts;
-    Object.keys(contacts).forEach(key => {
-      if (contacts[key]) {
-        newContacts[key] = contacts[key]
-      }
-    })
-
-    await this.userModel.updateOne(
+    const user = await this.userModel.findByIdAndUpdate(
       { _id },
       {
         $set: {
-          contacts: { ...newContacts }
+          contacts
         }
       },
       {
